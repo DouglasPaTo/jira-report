@@ -35,8 +35,12 @@ http://localhost:8000
    - `JIRA_URL` - URL do Jira (ex: https://kingit.atlassian.net)
    - `JIRA_EMAIL` - Seu email
    - `JIRA_API_TOKEN` - Token API do Jira
+   - `JIRA_PROJECT` - Key do projeto no Jira (padrão: SUP)
+   - `SECRET_KEY` - Chave para sessões (opcional)
 
 2. Execute `./setup.sh` se for a primeira vez
+
+**Nota**: O sistema busca tickets do projeto configurado em `JIRA_PROJECT`. O projeto precisa existir no Jira e deve ter tickets com status "Done".
 
 ## Uso
 
