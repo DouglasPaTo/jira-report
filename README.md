@@ -82,7 +82,7 @@ new-jreport/
 
 Se quiser personalizar o sistema com sua logo e favicon:
 
-- **Logo**: Place em `app/static/logo.png` (dimensão recomendada: 200x50px)
-- **Favicon**: Place em `app/static/favicon/favicon.ico` (dimensão recomendada: 32x32px)
+- **Logo**: Coloque em `app/static/logo.png` (dimensão recomendada: 200x50px)
+- **Favicon**: Coloque em `app/static/favicon/favicon.ico` (dimensão recomendada: 32x32px)
 
-O sistema detecta automaticamente se esses arquivos existirem e exibe no relatório.
+O sistema detecta automaticamente se esses arquivos existirem e exibe no relatório, converte em binário e sobe nos templates.
