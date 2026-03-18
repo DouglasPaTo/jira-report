@@ -100,6 +100,34 @@ O sistema detecta automaticamente!
 - Sessões seguras com chave secreta
 - Proteção contra ataques comuns
 - Credenciais em arquivo separado
+- **Controle de acesso por organizações**: Usuários comuns só veem tickets das organizações designadas
+
+## 👥 Controle de Acesso por Organizações
+
+O sistema permite criar dois tipos de usuários:
+
+### Usuário Admin
+- Acesso completo a todas as funcionalidades
+- Pode criar e gerenciar outros usuários
+- Vê todos os tickets e relatórios
+- Relatórios incluem coluna "Valor/h"
+
+### Usuário Comum (Cliente)
+- Acesso limitado às organizações designadas
+- Não pode acessar a página de gerenciamento de usuários
+- Vê apenas tickets das organizações que tem permissão
+- Relatórios **não** incluem coluna "Valor/h" (informação confidencial oculta)
+
+#### Criando usuários com acesso limitado
+
+1. Faça login como admin
+2. Acesse "Usuários" no menu
+3. No campo "Organizações", selecione:
+   - **"TODAS as organizações"**: Acesso a todas as organizações atuais e futuras
+   - Organizações específicas: Selecione uma ou mais organizações individuais
+4. Finalize a criação
+
+Isso é ideal para compartilhar relatórios com clientes, permitindo que vejam apenas os atendimentos realizados para a empresa deles.
 
 ## 📝 Requisitos
 
