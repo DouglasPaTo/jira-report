@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 import json
 from app.db.session import get_db
-from app.db.models import Ticket
+from app.db.models import Ticket, UserOrganization
 from app.services.jira_service import fetch_done_tickets, extract_ticket_data
 
 router = APIRouter()
@@ -33,12 +33,21 @@ def dashboard(
 ):
     try:
         user_id = request.session.get("user_id")
+        is_admin = request.session.get("is_admin", 0)
         if not user_id:
             return responses.RedirectResponse(url="/login")
     except:
         return responses.RedirectResponse(url="/login")
     
-    # Carregar TODAS as options antes de filtrar
+    user_orgs = []
+    has_todas = False
+    if not is_admin:
+        user_orgs = db.query(UserOrganization).filter(UserOrganization.user_id == user_id).all()
+        user_orgs = [uo.organization for uo in user_orgs]
+        if "__TODAS__" in user_orgs:
+            has_todas = True
+            user_orgs = []
+    
     all_tickets = db.query(Ticket).all()
     all_orgs = set()
     all_labels = set()
@@ -64,13 +73,13 @@ def dashboard(
             all_statuses.add(status_obj['name'])
         
         for org in orgs:
-            all_orgs.add(org)
+            if is_admin or has_todas or org in user_orgs:
+                all_orgs.add(org)
         for lbl in lbls:
             all_labels.add(lbl)
         if t.assignee:
             all_assignees.add(t.assignee)
     
-    # Agora aplicar os filtros
     query = db.query(Ticket)
     
     if start_date:
@@ -86,6 +95,11 @@ def dashboard(
             query = query.filter(Ticket.due_date <= end)
         except:
             pass
+    
+    if not is_admin and user_orgs and not has_todas:
+        org_filters = [Ticket.organizations.like(f'%"{org}"%') for org in user_orgs]
+        from sqlalchemy import or_
+        query = query.filter(or_(*org_filters))
     
     if organization and organization != "all":
         query = query.filter(Ticket.organizations.like(f'%"{organization}"%'))
@@ -192,6 +206,7 @@ async def exportar_html(
 ):
     try:
         user_id = request.session.get("user_id")
+        is_admin = request.session.get("is_admin", 0)
         if not user_id:
             raise HTTPException(status_code=401)
     except:
@@ -205,6 +220,15 @@ async def exportar_html(
     assignee = form.get("assignee")
     status = form.get("status")
     project = form.get("project")
+    
+    user_orgs = []
+    has_todas = False
+    if not is_admin:
+        user_orgs = db.query(UserOrganization).filter(UserOrganization.user_id == user_id).all()
+        user_orgs = [uo.organization for uo in user_orgs]
+        if "__TODAS__" in user_orgs:
+            has_todas = True
+            user_orgs = []
     
     query = db.query(Ticket)
     
@@ -224,6 +248,11 @@ async def exportar_html(
     
     if project and project != "all":
         query = query.filter(Ticket.extra_fields.like(f'%"name": "{project}"%'))
+    
+    if not is_admin and user_orgs and not has_todas:
+        org_filters = [Ticket.organizations.like(f'%"{org}"%') for org in user_orgs]
+        from sqlalchemy import or_
+        query = query.filter(or_(*org_filters))
     
     if organization and organization != "all":
         query = query.filter(Ticket.organizations.like(f'%"{organization}"%'))
@@ -358,6 +387,7 @@ async def exportar_html(
         'label_percentages': label_percentages,
         'label_counts': label_counts_sorted,
         'tickets': tickets_for_template,
+        'is_admin': is_admin,
     }
     
     from fastapi.templating import Jinja2Templates

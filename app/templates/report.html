@@ -310,7 +310,9 @@
                     <th>QTDE</th>
                     <th>Horas</th>
                     <th>Percentual</th>
+                    {% if is_admin %}
                     <th>Valor/h</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -320,6 +322,7 @@
                     <td>{{ label_counts[label] }}</td>
                     <td>{{ mins_formatted[label] }}</td>
                     <td>{{ label_percentages[label] }}%</td>
+                    {% if is_admin %}
                     <td>
                         <input type="text" class="input-valor" 
                                data-field="valor_{{ label|lower|replace(' ', '_')|e }}" 
@@ -327,6 +330,7 @@
                                value="R$ 0,00"
                                oninput="updateTotal()">
                     </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
                 <tr>
@@ -334,7 +338,9 @@
                     <td><strong>{{ total_tickets }}</strong></td>
                     <td><strong>{{ total_time_formatted }}</strong></td>
                     <td><strong>100%</strong></td>
+                    {% if is_admin %}
                     <td><strong><input type="text" id="valor_total" readonly style="width: 80px; text-align: right; border: none; background: transparent;"></strong></td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
@@ -370,7 +376,7 @@
         </div>
         
         <div class="footer">
-            Relatório gerado automaticamente_-_DLS-TI_(╯°□°)╯︵ ┻━┻
+            Relatório {% if is_admin %}administrativo{% else %}cliente{% endif %}_-_DLS-TI_(╯°□°)╯︵ ┻━┻
         </div>
     </div>
     

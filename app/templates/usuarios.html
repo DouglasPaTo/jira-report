@@ -17,12 +17,19 @@
 
     <div class="max-w-7xl mx-auto py-6 px-4">
         <!-- Criar usuário -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 items-start">
             <div class="bg-white p-6 rounded-lg shadow">
                 <h2 class="text-xl font-bold mb-4">Criar Usuário Comum</h2>
                 <form id="criarForm" class="flex flex-col gap-3">
                     <input type="text" name="username" placeholder="Nome de usuário" required class="border rounded px-3 py-2">
                     <input type="password" name="password" placeholder="Senha" required class="border rounded px-3 py-2">
+                    <label class="text-sm text-gray-600">Organizações (Ctrl+Click para múltiplas):</label>
+                    <select name="organizations" multiple size="14" class="border rounded px-3 py-2 h-64">
+                        <option value="TODAS">🔓 TODAS as organizações (inclui futuras)</option>
+                        {% for org in organizations %}
+                        <option value="{{ org }}">{{ org }}</option>
+                        {% endfor %}
+                    </select>
                     <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Criar Usuário</button>
                 </form>
             </div>
@@ -32,6 +39,7 @@
                 <form id="criarAdminForm" class="flex flex-col gap-3">
                     <input type="text" name="username" placeholder="Nome de usuário admin" required class="border rounded px-3 py-2">
                     <input type="password" name="password" placeholder="Senha" required class="border rounded px-3 py-2">
+                    <p class="text-sm text-gray-500">Admin acesso total ao sistema</p>
                     <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Criar Admin</button>
                 </form>
             </div>
@@ -99,6 +107,9 @@ function showToast(message, isError = false) {
 document.getElementById('criarForm').onsubmit = function(e) {
     e.preventDefault();
     const formData = new FormData(this);
+    const selectedOrgs = Array.from(this.querySelector('select[name="organizations"]').selectedOptions)
+        .map(opt => opt.value);
+    formData.set("organizations", selectedOrgs.join(","));
     fetch('/usuarios/criar', { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {

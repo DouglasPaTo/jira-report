@@ -10,7 +10,9 @@
         <div class="max-w-7xl mx-auto py-6 px-4 flex justify-between items-center">
             <h1 class="text-3xl font-bold text-gray-800">Jira Reports</h1> 
             <div class="flex items-center gap-4">
+                {% if request.session.get('is_admin') %}
                 <a href="/usuarios" class="text-blue-600 hover:text-blue-800">Usuários</a>
+                {% endif %}
                 <span class="text-gray-600">Olá, {{ request.session.get('username') }} (╯°□°)╯︵ ┻━┻</span>
                 <a href="/logout" class="text-red-600 hover:text-red-800">Sair</a>
             </div>

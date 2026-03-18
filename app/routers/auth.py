@@ -2,8 +2,9 @@ from fastapi import APIRouter, Request, Depends, HTTPException, responses
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
+import json
 from app.db.session import get_db
-from app.db.models import User
+from app.db.models import User, UserOrganization, Ticket
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -60,17 +61,36 @@ async def usuarios_page(request: Request, db: Session = Depends(get_db)):
     if not request.session.get("user_id"):
         return responses.RedirectResponse(url="/login")
     
+    if not request.session.get("is_admin"):
+        return responses.RedirectResponse(url="/")
+    
     users = db.query(User).all()
-    return templates.TemplateResponse("usuarios.html", {"request": request, "users": users})
+    
+    all_tickets = db.query(Ticket).all()
+    all_orgs = set()
+    for t in all_tickets:
+        orgs = json.loads(t.organizations) if t.organizations else []
+        for org in orgs:
+            all_orgs.add(org)
+    
+    sorted_orgs = sorted(list(all_orgs))
+    
+    return templates.TemplateResponse("usuarios.html", {
+        "request": request,
+        "users": users,
+        "organizations": sorted_orgs
+    })
 
 @router.post("/usuarios/criar")
 async def criar_usuario(request: Request, db: Session = Depends(get_db)):
-    if not request.session.get("user_id"):
+    if not request.session.get("user_id") or not request.session.get("is_admin"):
         return {"error": "Não autorizado"}
     
     form = await request.form()
     username = form.get("username")
     password = form.get("password")
+    orgs_str = form.get("organizations", "")
+    selected_orgs = [o.strip() for o in orgs_str.split(",") if o.strip()]
     
     existing = db.query(User).filter(User.username == username).first()
     if existing:
@@ -83,12 +103,29 @@ async def criar_usuario(request: Request, db: Session = Depends(get_db)):
     )
     db.add(new_user)
     db.commit()
+    db.refresh(new_user)
+    
+    for org in selected_orgs:
+        if org == "TODAS":
+            user_org = UserOrganization(
+                user_id=new_user.id,
+                organization="__TODAS__"
+            )
+            db.add(user_org)
+            break
+        elif org:
+            user_org = UserOrganization(
+                user_id=new_user.id,
+                organization=org
+            )
+            db.add(user_org)
+    db.commit()
     
     return {"message": f"Usuário {username} criado com sucesso!"}
 
 @router.post("/usuarios/excluir")
 async def excluir_usuario(request: Request, db: Session = Depends(get_db)):
-    if not request.session.get("user_id"):
+    if not request.session.get("user_id") or not request.session.get("is_admin"):
         return {"error": "Não autorizado"}
     
     form = await request.form()
@@ -98,6 +135,7 @@ async def excluir_usuario(request: Request, db: Session = Depends(get_db)):
     if user:
         if user.username == "usrking":
             return {"error": "Não é possível excluir o admin padrão"}
+        db.query(UserOrganization).filter(UserOrganization.user_id == user_id).delete()
         db.delete(user)
         db.commit()
         return {"message": "Usuário excluído"}
@@ -106,7 +144,7 @@ async def excluir_usuario(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/usuarios/alterar-senha")
 async def alterar_senha(request: Request, db: Session = Depends(get_db)):
-    if not request.session.get("user_id"):
+    if not request.session.get("user_id") or not request.session.get("is_admin"):
         return {"error": "Não autorizado"}
     
     form = await request.form()
@@ -126,7 +164,7 @@ async def alterar_senha(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/usuarios/criar-admin")
 async def criar_admin(request: Request, db: Session = Depends(get_db)):
-    if not request.session.get("user_id"):
+    if not request.session.get("user_id") or not request.session.get("is_admin"):
         return {"error": "Não autorizado"}
     
     form = await request.form()

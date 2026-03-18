@@ -29,3 +29,10 @@ class User(Base):
     is_admin = Column(Integer, default=0)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class UserOrganization(Base):
+    __tablename__ = "user_organizations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    organization = Column(String, index=True)
