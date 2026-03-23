@@ -1,0 +1,7 @@
+# Jira Configuration
+JIRA_URL=https://dls-tec.atlassian.net
+JIRA_EMAIL=doug868401@gmail.com
+JIRA_API_TOKEN=ATATT3xFfGF0cS34G7vw1ZsX_s58HaOSG0FMxQG0_HaF9pEQ-lPZCMGpCBjagwuabUpQuaT17ul0MO9n-xbnt8qLYOnwqJ3DCLv7U9edZQuVHjahhIXLVEgB25XPLEu0-tFOTBWiUh7FaU__r9DnSW0EIZRu_tBGGZTGMpgOa0a_j_qdA8QMXPs=93BD12E0
+
+# App Configuration
+SECRET_KEY=change-this-to-something-random

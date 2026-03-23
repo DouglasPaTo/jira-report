@@ -45,7 +45,7 @@ def embed_attachment_images(html_content, attachments, session):
         if download_url:
             b64_img = download_image_as_base64(download_url, session)
             if b64_img:
-                images_html += f'<img src="{b64_img}" alt="{att.get("filename", "imagem")}" style="max-width: 100%; height: auto; border-radius: 4px; margin: 8px 0;"/><br/>'
+                images_html += f'<img src="{b64_img}" alt="{att.get("filename", "imagem")}" style="max-width: 100%; max-height: 600px; width: auto; height: auto; border-radius: 4px; margin: 8px 0;"/><br/>'
     
     return html_content + images_html
 
@@ -166,7 +166,8 @@ def parse_adf_to_html(adf_obj, session=None, attachments=None, debug_key=None):
                 b64_img = download_attachment(att)
                 if b64_img:
                     width = block.get('attrs', {}).get('width', 400)
-                    html_parts.append(f'<img src="{b64_img}" alt="imagem" style="max-width: {width}px; height: auto; border-radius: 4px; margin: 8px 0;"/>')
+                    width_attr = min(width, 600)
+                    html_parts.append(f'<img src="{b64_img}" alt="imagem" style="max-width: 100%; max-height: 600px; width: auto; height: auto; border-radius: 4px; margin: 8px 0;"/>')
                 else:
                     html_parts.append('<span style="color: #999;">[Imagem não disponível]</span>')
         
@@ -177,7 +178,7 @@ def parse_adf_to_html(adf_obj, session=None, attachments=None, debug_key=None):
                     media_index[0] += 1
                     b64_img = download_attachment(att)
                     if b64_img:
-                        html_parts.append(f'<img src="{b64_img}" alt="imagem" style="max-width: 100%; height: auto; border-radius: 4px; margin: 8px 0;"/>')
+                        html_parts.append(f'<img src="{b64_img}" alt="imagem" style="max-width: 100%; max-height: 600px; width: auto; height: auto; border-radius: 4px; margin: 8px 0;"/>')
                 
         elif block_type == 'heading':
             level = block.get('attrs', {}).get('level', 1)

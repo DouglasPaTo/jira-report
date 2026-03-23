@@ -1,0 +1,7 @@
+# Jira Configuration
+JIRA_URL=https://doug868402.atlassian.net
+JIRA_EMAIL=doug868402@gmail.com
+JIRA_API_TOKEN=ATATT3xFfGF0Z9ltVC7cjsBf4qf8S_enljlPF0XwHxjoej5Jtf_UqH-Xj1Q7ZIqtOlzv_elW99E18qIS5yBeomFrC2zNQQrvrne6UMT0CMkxQn072hq9YmrNPzCR0CTAPseiAilVe44_16QHf_W9ZWNShGkf-xLOm-3Ojjhkny5q7ZRETgl4p6U=BAF17F72
+
+# App Configuration
+SECRET_KEY=change-this-to-something-random
