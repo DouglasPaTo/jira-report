@@ -149,8 +149,49 @@ Isso é ideal para compartilhar relatórios com clientes, permitindo que vejam a
 - Imprimiu (PDF), enviou
 <img width="1216" height="900" alt="jira2" src="https://github.com/user-attachments/assets/239786d3-6305-4a9b-84a0-15977de5628a" />
 
-## Observação
-- O campo Descrição busca apenas o último comentário gerado no Jira
+## 📸 Suporte a Imagens nos Relatórios
+
+O sistema processa automaticamente imagens coladas no Jira e as inclui nos relatórios:
+
+### Como funciona
+1. Quando você cola uma imagem no campo **Description** ou **Comment** do Jira, ela é salva como attachment
+2. O sistema baixa as imagens e converte para base64
+3. As imagens são embutidas no HTML na posição correta (mantendo o contexto)
+4. Imagens largas são redimensionadas automaticamente para caber no layout
+
+### Formatações suportadas
+- Texto com quebras de linha (`hardBreak`)
+- Imagens inline (`mediaSingle`, `mediaGroup`)
+- Negrito, itálico, código, links
+- Listas (ordenadas e não ordenadas)
+- Blocos de citação e código
+
+### Observações
+- Imagens são salvas no banco de dados como base64 (não dependem de URL externa)
+- Relatórios funcionam offline
+- Limite máximo de altura: 600px (mantém legibilidade)
+
+## 📝 Requisitos
+
+- Linux (testado no Ubuntu)
+- Python 3.10+
+- Acesso à internet (para API do Jira)
+- **IMPORTANTE**: Após atualizações do código que alteram o formato dos dados, delete o banco (`app/jira_reports.db`) e recarregue os tickets
+
+## Dashboard
+
+- Interface fácil de usar
+- Lista completa de tickets
+<img width="1335" height="578" alt="jira1" src="https://github.com/user-attachments/assets/a1ddfefd-a8ef-4c74-af78-afff080bf8ff" /> 
+ 
+## Relatório
+
+- Relatório simples e objetivo
+- Informações fáceis de entender
+- Cálculo de custo em tipos diferentes de atendimento
+- Imagens do Jira preservadas na posição correta
+- Imagens largas redimensionam automaticamente
+<img width="1216" height="900" alt="jira2" src="https://github.com/user-attachments/assets/239786d3-6305-4a9b-84a0-15977de5628a" />
 
 ## 📄 Licença
 

@@ -8,14 +8,14 @@
 ## Estrutura de Diretórios
 
 ```
-new-jreport/
+jira-calls/
 ├── app/                          # Aplicação principal
 │   ├── main.py                   # Entry point FastAPI
 │   ├── routers/                  # Rotas da aplicação
 │   │   ├── web.py                # Dashboard, filtros, export
 │   │   └── auth.py               # Login, usuários
 │   ├── services/                 # Integração Jira
-│   │   └── jira_service.py       # API Jira
+│   │   └── jira_service.py       # API Jira, processamento ADP
 │   ├── db/                       # Banco de dados
 │   │   ├── session.py            # Config SQLite
 │   │   └── models.py             # Modelos (Ticket, User)
@@ -63,6 +63,17 @@ new-jreport/
 - `get_jira_auth()` - Autenticação
 - `fetch_done_tickets()` - Busca tickets done do Jira
 - `extract_ticket_data()` - Extrai dados do ticket
+- `parse_adf_to_html()` - Converte Atlassian Document Format (ADP) para HTML
+- `embed_attachment_images()` - Embutir imagens como base64
+- `download_image_as_base64()` - Baixa imagem do Jira e converte
+- `embed_images_in_html()` - Substitui URLs de imagens por base64
+
+### app/routers/web.py
+- Dashboard principal (`/`)
+- Filtros por data, organização, label, responsável, status, projeto
+- Atualização de tickets do Jira (`/atualizar`)
+- Exportação HTML (`/exportar`)
+- Suporte a imagens nos relatórios exportados
 
 ### app/templates/report.html
 - Template de exportação HTML
@@ -88,3 +99,26 @@ new-jreport/
 | JIRA_EMAIL | Email de acesso |
 | JIRA_API_TOKEN | Token API do Jira |
 | SECRET_KEY | Chave para sessões |
+
+## Processamento de Imagens
+
+O Jira armazena descrições e comentários no formato **Atlassian Document Format (ADP)**. O sistema processa esse formato para gerar HTML:
+
+### Blocos ADP suportados
+- `paragraph` → `<p>`
+- `heading` → `<h1>` a `<h6>`
+- `bulletList` → `<ul>`
+- `orderedList` → `<ol>`
+- `codeBlock` → `<pre><code>`
+- `blockquote` → `<blockquote>`
+- `mediaSingle` → `<img>` (imagem individual)
+- `mediaGroup` → `<img>` (grupo de imagens)
+- `hardBreak` → `<br/>`
+- `text` com marks → `<strong>`, `<em>`, `<code>`, `<a>`
+
+### Fluxo de imagens
+1. Jira retorna ADF com referências de mídia (`media`)
+2. Sistema busca attachments do ticket
+3. Mapeia mídias → attachments de imagem
+4. Baixa imagens e converte para base64
+5. Insere no HTML mantendo a posição original
